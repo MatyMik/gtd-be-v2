@@ -7,15 +7,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
 @Module({
   imports: [
     AuthenticationModule,
-    MikroOrmModule.forRoot({
-      type: 'postgresql',
-      host: 'localhost',
-      port: 5432,
-      user: 'postgres',
-      password: 'postgres',
-      dbName: 'postgres',
-      autoLoadEntities: true,
-    }),
+    MikroOrmModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

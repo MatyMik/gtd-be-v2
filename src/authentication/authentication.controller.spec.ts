@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { UserService } from './user.service';
@@ -61,6 +60,31 @@ describe('AuthenticationController', () => {
           confirmPassword: 'password',
         }),
       ).resolves.toStrictEqual(userWithId);
+    });
+  });
+  describe('login', () => {
+    it('should throw an error if the email is not registered', async () => {
+      jest
+        .spyOn(userService, 'findByEmail')
+        .mockImplementation(async () => null);
+      await expect(
+        controller.login({
+          email,
+          password,
+        }),
+      ).rejects.toThrow('This email is not registered');
+    });
+    it('should throw an error if the password is incorrect', async () => {
+      jest
+        .spyOn(userService, 'findByEmail')
+        .mockImplementation(async () => user);
+      jest.spyOn(service, 'hashPassword').mockImplementation(async () => 'as');
+      await expect(
+        controller.login({
+          email,
+          password,
+        }),
+      ).rejects.toThrow('Incorrect password');
     });
   });
 });
