@@ -1,7 +1,24 @@
-import { User } from "./src/authentication/entities/user.entity";
+import { LoadStrategy } from '@mikro-orm/core';
+import { defineConfig } from '@mikro-orm/postgresql';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { Migrator } from '@mikro-orm/migrations';
+import { EntityGenerator } from '@mikro-orm/entity-generator';
+import { SeedManager } from '@mikro-orm/seeder';
 
-export default {
-  entities: [User], // no need for `entitiesTs` this way
+export default defineConfig({
+  host: 'database',
+  port: 5432,
+  user: 'postgres',
+  password: 'postgres',
   dbName: 'postgres',
-  type: 'postgresql', // one of `mongo` | `mysql` | `mariadb` | `postgresql` | `sqlite`
-};
+  entities: ['dist/**/*.entity.js'],
+  entitiesTs: ['src/**/*.entity.ts'],
+  debug: true,
+  loadStrategy: LoadStrategy.JOINED,
+  highlighter: new SqlHighlighter(),
+  metadataProvider: TsMorphMetadataProvider,
+  // @ts-expect-error nestjs adapter option
+  registerRequestContext: false,
+  extensions: [Migrator, EntityGenerator, SeedManager],
+});
