@@ -63,6 +63,10 @@ describe('AuthenticationController', () => {
     });
   });
   describe('login', () => {
+    beforeAll(() => {
+      process.env.ACCESS_TOKEN_SECRET = 'access';
+      process.env.REFRESH_TOKEN_SECRET = 'refresh';
+    });
     it('should throw an error if the email is not registered', async () => {
       jest
         .spyOn(userService, 'findByEmail')
@@ -85,6 +89,23 @@ describe('AuthenticationController', () => {
           password,
         }),
       ).rejects.toThrow('Incorrect password');
+    });
+    it('returns access and refresh tokens when login is valid', async () => {
+      jest
+        .spyOn(userService, 'findByEmail')
+        .mockImplementation(async () => user);
+      jest
+        .spyOn(service, 'verifyPassword')
+        .mockImplementation(async () => true);
+      await expect(
+        controller.login({
+          email,
+          password,
+        }),
+      ).resolves.toStrictEqual({
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
+      });
     });
   });
 });

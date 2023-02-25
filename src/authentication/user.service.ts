@@ -14,10 +14,15 @@ export class UserService {
     return await this.usersRepository.findOne({ email });
   }
 
+  async findById(id: number) {
+    return await this.usersRepository.findOne({ id });
+  }
+
   async createUser({ email, password }) {
     const user = new User();
     user.email = email;
     user.password = password;
     await this.usersRepository.persistAndFlush(user);
+    return user;
   }
 }

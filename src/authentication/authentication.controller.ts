@@ -1,8 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { RegisterUserDto } from './DTOs/register.dto';
 import { UserService } from './user.service';
 import { LoginDto } from './DTOs/login.dto';
+import { JwtData } from './authentication.types';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -30,19 +31,54 @@ export class AuthenticationController {
     });
   }
 
-  @Post('register')
+  @Post('login')
   async login(@Body() body: LoginDto) {
     const { email, password } = body;
     const user = await this.UserService.findByEmail(email);
     if (!user) {
       throw new Error('"This email is not registered"');
     }
-    const hashedPassword = await this.AuthenticationService.hashPassword(
+    const isPasswordValid = await this.AuthenticationService.verifyPassword(
       password,
+      user.password,
     );
-    return await this.UserService.createUser({
-      email,
-      password: hashedPassword,
-    });
+    if (!isPasswordValid) {
+      throw new Error('Incorrect password');
+    }
+    const accessToken = this.AuthenticationService.generateToken(
+      user,
+      process.env.ACCESS_TOKEN_SECRET,
+    );
+    const refreshToken = this.AuthenticationService.generateToken(
+      user,
+      process.env.REFRESH_TOKEN_SECRET,
+      '7d',
+    );
+    return { accessToken, refreshToken };
+  }
+
+  @Post('refresh')
+  async refresh(@Headers() headers: any) {
+    console.log(headers);
+    const refreshToken = this.AuthenticationService.extractTokenFromHeader(
+      headers.authorization,
+    );
+    console.log(refreshToken);
+    const tokenData: JwtData = await this.AuthenticationService.verifyToken(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    );
+    const { userId } = tokenData;
+    const user = await this.UserService.findById(userId);
+    const accessToken = this.AuthenticationService.generateToken(
+      user,
+      process.env.ACCESS_TOKEN_SECRET,
+    );
+    const newRefreshToken = this.AuthenticationService.generateToken(
+      user,
+      process.env.REFRESH_TOKEN_SECRET,
+      '7d',
+    );
+    return { accessToken, refreshToken: newRefreshToken, userId };
   }
 }
