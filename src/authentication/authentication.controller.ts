@@ -54,31 +54,34 @@ export class AuthenticationController {
       process.env.REFRESH_TOKEN_SECRET,
       '7d',
     );
+    console.log(accessToken, refreshToken);
     return { accessToken, refreshToken };
   }
 
   @Post('refresh')
   async refresh(@Headers() headers: any) {
-    console.log(headers);
-    const refreshToken = this.AuthenticationService.extractTokenFromHeader(
-      headers.authorization,
-    );
-    console.log(refreshToken);
-    const tokenData: JwtData = await this.AuthenticationService.verifyToken(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
-    );
-    const { userId } = tokenData;
-    const user = await this.UserService.findById(userId);
-    const accessToken = this.AuthenticationService.generateToken(
-      user,
-      process.env.ACCESS_TOKEN_SECRET,
-    );
-    const newRefreshToken = this.AuthenticationService.generateToken(
-      user,
-      process.env.REFRESH_TOKEN_SECRET,
-      '7d',
-    );
-    return { accessToken, refreshToken: newRefreshToken, userId };
+    try {
+      const refreshToken = this.AuthenticationService.extractTokenFromHeader(
+        headers.authorization,
+      );
+      const tokenData: JwtData = await this.AuthenticationService.verifyToken(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+      );
+      const { userId } = tokenData;
+      const user = await this.UserService.findById(userId);
+      const accessToken = this.AuthenticationService.generateToken(
+        user,
+        process.env.ACCESS_TOKEN_SECRET,
+      );
+      const newRefreshToken = this.AuthenticationService.generateToken(
+        user,
+        process.env.REFRESH_TOKEN_SECRET,
+        '7d',
+      );
+      return { accessToken, refreshToken: newRefreshToken, userId };
+    } catch (e) {
+      throw new Error('Invalid refresh token');
+    }
   }
 }

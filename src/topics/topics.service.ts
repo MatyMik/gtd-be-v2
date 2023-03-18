@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { Topic } from './entities/topic.entity';
-import { User } from '../authentication/entities/user.entity';
+import { Topic } from './topic.entity';
 import { CreateTopicDto } from './DTOs/create-topic.dto';
 
 @Injectable()
@@ -12,9 +11,9 @@ export class TopicsService {
     private topicsRepository?: EntityRepository<Topic>,
   ) {}
 
-  async findAllForUser(user: User) {
+  async findAllForUser(userId: number) {
     return await this.topicsRepository.find(
-      { userId: user.id },
+      { userId },
       {
         fields: ['name', 'id'],
       },
@@ -22,24 +21,19 @@ export class TopicsService {
   }
 
   async findAll(topicIds: number[]) {
-    return await this.topicsRepository.find(
-      { id: topicIds },
-      {
-        fields: ['name', 'id'],
-      },
-    );
+    return await this.topicsRepository.find({ id: topicIds });
   }
 
-  async createTopic(user: User, topic: CreateTopicDto) {
+  async createTopic(userId: number, topic: CreateTopicDto) {
     const newTopic = new Topic();
     newTopic.name = topic.name;
-    newTopic.userId = user.id;
+    newTopic.userId = userId;
     await this.topicsRepository.persistAndFlush(newTopic);
     return newTopic;
   }
 
-  async findOne(id: number, user) {
-    return await this.topicsRepository.findOne({ id, userId: user.id });
+  async findOne(id: number, userId: number) {
+    return await this.topicsRepository.findOne({ id, userId });
   }
 
   async deleteTopic(topic: Topic) {

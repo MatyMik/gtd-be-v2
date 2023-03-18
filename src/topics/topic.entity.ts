@@ -5,8 +5,9 @@ export class Topic {
   @PrimaryKey()
   id: number;
 
-  @Property({ hidden: true, nullable: false })
+  @Property({ nullable: false })
   name: string;
 
+  @Property({ nullable: false })
   userId: number;
 }

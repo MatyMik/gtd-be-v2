@@ -5,12 +5,12 @@ export class Tag {
   @PrimaryKey()
   id: number;
 
-  @Property({ hidden: true, nullable: false })
+  @Property({ nullable: false })
   name: string;
 
-  @Property({ hidden: true, nullable: false })
+  @Property({ nullable: true })
   color: string;
 
-  @Property({ hidden: true, default: false, nullable: false })
+  @Property({ hidden: true, nullable: false })
   userId: number;
 }

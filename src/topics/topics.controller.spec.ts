@@ -1,7 +1,7 @@
 import { TopicsController } from './topics.controller';
 import { TopicsService } from './topics.service';
 import { mockTopics } from '../test/mock-topics';
-import { Topic } from './entities/topic.entity';
+import { Topic } from './topic.entity';
 
 describe('TopicsController', () => {
   let controller: TopicsController;

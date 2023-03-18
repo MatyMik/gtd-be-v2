@@ -1,17 +1,18 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateProjectDto {
+export class CreateNextActionDto {
   @IsNotEmpty()
   name: string;
 
   tags?: number[];
 
-  deadline?: number;
-
-  active?: boolean;
+  @IsNotEmpty()
+  deadline: number;
 
   done?: boolean;
 
   @IsNotEmpty()
-  topicId: number;
+  projectId: number;
+
+  description: string;
 }

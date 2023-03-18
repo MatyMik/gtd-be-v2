@@ -8,22 +8,22 @@ export class TopicsController {
   constructor(private readonly topicsService: TopicsService) {}
 
   @Get()
-  async getTopics(@User() user) {
-    return await this.topicsService.findAllForUser(user);
+  async getTopics(@User() userId) {
+    return { topics: await this.topicsService.findAllForUser(userId) };
   }
 
   @Post()
-  async createTopic(@User() user, @Body() topic: CreateTopicDto) {
-    const topics = await this.topicsService.findAllForUser(user);
+  async createTopic(@User() userId, @Body() topic: CreateTopicDto) {
+    const topics = await this.topicsService.findAllForUser(userId);
     if (topics.some((t) => t.name === topic.name)) {
       throw new Error('Topic name already used');
     }
-    return await this.topicsService.createTopic(user, topic);
+    return await this.topicsService.createTopic(userId, topic);
   }
 
   @Delete(':id')
-  async deleteTopic(@User() user, @Param('id') id: number) {
-    const topic = await this.topicsService.findOne(id, user);
+  async deleteTopic(@User() userId, @Param('id') id: number) {
+    const topic = await this.topicsService.findOne(id, userId);
     if (!topic) {
       throw new Error('Topic does not exist');
     }

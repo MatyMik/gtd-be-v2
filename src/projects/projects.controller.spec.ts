@@ -2,7 +2,7 @@ import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
 import { TopicsService } from '../topics/topics.service';
 import { NextActionsService } from './next-actions.service';
-import { Topic } from '../topics/entities/topic.entity';
+import { Topic } from '../topics/topic.entity';
 import { mockProjects } from '../test/mock-projects';
 
 const mockTopics = [

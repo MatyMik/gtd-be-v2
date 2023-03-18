@@ -1,7 +1,7 @@
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { UserService } from './user.service';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 
 const email = 'test@test.com';
 const password = 'password';

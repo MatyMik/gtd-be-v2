@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { Tag } from './entities/tag.entity';
+import { Tag } from './tag.entity';
 
 @Injectable()
 export class TagsService {
@@ -21,5 +21,13 @@ export class TagsService {
     tag.userId = userId;
     await this.tagsRepository.persistAndFlush(tag);
     return tag;
+  }
+
+  async createTags(userId: number, tags: { name: string; color: string }[]) {
+    for (const tag of tags) {
+      const newTag = await this.createTag(userId, tag.name, tag.color);
+      this.tagsRepository.persist(newTag);
+    }
+    return await this.tagsRepository.flush();
   }
 }

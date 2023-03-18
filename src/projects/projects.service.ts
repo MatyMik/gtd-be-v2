@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { Project } from './entities/project.entity';
-import { Topic } from '../topics/entities/topic.entity';
-import { User } from '../authentication/entities/user.entity';
+import { Project } from './project.entity';
+import { Topic } from '../topics/topic.entity';
 import { CreateProjectDto } from './DTOs/create-project.dto';
+import { UpdateProjectDto } from './DTOs/update-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -24,7 +24,7 @@ export class ProjectsService {
   async createProject(
     project: CreateProjectDto,
     topic: Topic,
-    user: User,
+    userId: number,
   ): Promise<Partial<Project>> {
     const newProject = new Project();
     newProject.name = project.name;
@@ -32,16 +32,33 @@ export class ProjectsService {
     newProject.active = project.active;
     newProject.done = project.done;
     newProject.topic = topic;
-    newProject.userId = user.id;
+    newProject.userId = userId;
+    newProject.tags = project.tags;
     await this.projectsRepository.persistAndFlush(newProject);
     return newProject;
   }
 
-  async findById(id, user) {
-    return await this.projectsRepository.find({ id, userId: user.id });
+  async findById(id, userId): Promise<Project> {
+    return await this.projectsRepository.findOne({ id, userId });
   }
 
   async deleteProject(id: number) {
     return await this.projectsRepository.removeAndFlush({ id });
+  }
+
+  async updateProject(project: Project, updateProjectData: UpdateProjectDto) {
+    project.name = updateProjectData.name || project.name;
+    project.deadline = updateProjectData.deadline || project.deadline;
+    project.tags = updateProjectData.tags || project.tags;
+    project.active =
+      updateProjectData.active !== undefined
+        ? updateProjectData.active
+        : project.active;
+    project.done =
+      updateProjectData.done !== undefined
+        ? updateProjectData.done
+        : project.done;
+    await this.projectsRepository.persistAndFlush(project);
+    return project;
   }
 }

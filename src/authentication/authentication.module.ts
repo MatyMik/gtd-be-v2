@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { UserService } from './user.service';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
 @Module({
