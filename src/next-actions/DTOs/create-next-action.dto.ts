@@ -7,12 +7,15 @@ export class CreateNextActionDto {
   tags?: number[];
 
   @IsNotEmpty()
-  deadline: number;
+  deadline: Date;
 
   done?: boolean;
 
   @IsNotEmpty()
-  projectId: number;
+  project: number;
 
   description: string;
+
+  @IsNotEmpty()
+  userId: number;
 }

@@ -30,4 +30,8 @@ export class TagsService {
     }
     return await this.tagsRepository.flush();
   }
+
+  async findTagsByIds(ids: number[], userId: number) {
+    return await this.tagsRepository.find({ id: { $in: ids }, userId });
+  }
 }

@@ -4,12 +4,14 @@ import { NextActionsService } from './next-actions.service';
 import { CreateNextActionDto } from './DTOs/create-next-action.dto';
 import { ProjectsService } from '../projects/projects.service';
 import { UpdateNextActionDto } from './DTOs/update-next-action.dto';
+import { TagsService } from '../tags/tags.service';
 
 @Controller('next-actions')
 export class NextActionsController {
   constructor(
     private nextActionsService: NextActionsService,
     private projectsService: ProjectsService,
+    private tagsService: TagsService,
   ) {}
 
   @Post('')
@@ -18,7 +20,7 @@ export class NextActionsController {
     @Body() nextAction: CreateNextActionDto,
   ) {
     const project = await this.projectsService.findById(
-      nextAction.projectId,
+      nextAction.project,
       userId,
     );
     if (!project) {
@@ -29,11 +31,7 @@ export class NextActionsController {
     if (nextActionsOfProject.some((proj) => proj.name === project.name)) {
       throw new Error('Next Action already used');
     }
-    return await this.nextActionsService.createNextAction(
-      nextAction,
-      project,
-      userId,
-    );
+    return await this.nextActionsService.createNextAction(nextAction);
   }
 
   @Get()
@@ -43,7 +41,9 @@ export class NextActionsController {
     }
     const project = await this.projectsService.findById(projectId, userId);
     if (!project) throw new Error('Project does not exist');
-    return await this.nextActionsService.findAllForProject(project);
+    const nAs = await this.nextActionsService.findAllForProject(project);
+    console.log(nAs);
+    return nAs;
   }
 
   @Put(':id')
@@ -57,6 +57,7 @@ export class NextActionsController {
       userId,
     );
     if (!nextActionToUpdate) throw new Error('Next Action does not exist');
+    const tags = await this.tagsService.findTagsByIds(nextAction.tags, userId);
     return await this.nextActionsService.updateNextAction(
       nextActionToUpdate,
       nextAction,
