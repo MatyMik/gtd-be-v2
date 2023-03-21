@@ -241,15 +241,6 @@
           "length": 6,
           "mappedType": "datetime"
         },
-        "tags": {
-          "name": "tags",
-          "type": "text[]",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "array"
-        },
         "done": {
           "name": "done",
           "type": "boolean",
@@ -323,6 +314,71 @@
             "id"
           ],
           "referencedTableName": "public.project",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "next_action_id": {
+          "name": "next_action_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "next_action_tags",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "next_action_tags_pkey",
+          "columnNames": [
+            "next_action_id",
+            "tag_id"
+          ],
+          "composite": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "next_action_tags_next_action_id_foreign": {
+          "constraintName": "next_action_tags_next_action_id_foreign",
+          "columnNames": [
+            "next_action_id"
+          ],
+          "localTableName": "public.next_action_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.next_action",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "next_action_tags_tag_id_foreign": {
+          "constraintName": "next_action_tags_tag_id_foreign",
+          "columnNames": [
+            "tag_id"
+          ],
+          "localTableName": "public.next_action_tags",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.tag",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }

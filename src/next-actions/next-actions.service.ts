@@ -17,29 +17,23 @@ export class NextActionsService {
   async findAllForProject(project: Project) {
     return await this.nextActionsRepository.find(
       { project, done: false },
-      { orderBy: { createdAt: QueryOrder.ASC } },
+      { populate: ['tags'], orderBy: { createdAt: QueryOrder.ASC } },
     );
   }
 
   async createNextAction(
     nextAction: CreateNextActionDto,
-    project: Project,
-    userId: number,
   ): Promise<Partial<NextAction>> {
-    const newNextAction = new NextAction();
-    newNextAction.name = nextAction.name;
-    newNextAction.deadline = new Date(nextAction.deadline);
-    newNextAction.done = nextAction.done;
-    newNextAction.project = project;
-    newNextAction.userId = userId;
-    newNextAction.description = nextAction.description;
-    newNextAction.tags = nextAction.tags;
+    const newNextAction = this.nextActionsRepository.create(nextAction);
     await this.nextActionsRepository.persistAndFlush(newNextAction);
     return newNextAction;
   }
 
   async findById(id, userId): Promise<NextAction> {
-    return await this.nextActionsRepository.findOne({ id, userId });
+    return await this.nextActionsRepository.findOne(
+      { id, userId },
+      { populate: ['tags'] },
+    );
   }
 
   async deleteNextAction(id: number) {
@@ -50,24 +44,16 @@ export class NextActionsService {
     nextActionToUpdate: NextAction,
     newNextAction: UpdateNextActionDto,
   ) {
-    nextActionToUpdate.name = newNextAction.name || nextActionToUpdate.name;
-    nextActionToUpdate.deadline =
-      newNextAction.deadline || nextActionToUpdate.deadline;
-    nextActionToUpdate.done =
-      newNextAction.done !== undefined
-        ? newNextAction.done
-        : nextActionToUpdate.done;
-    nextActionToUpdate.description =
-      newNextAction.description || nextActionToUpdate.description;
-    nextActionToUpdate.tags = newNextAction.tags || nextActionToUpdate.tags;
-    await this.nextActionsRepository.persistAndFlush(nextActionToUpdate);
-    return nextActionToUpdate;
+    return await this.nextActionsRepository.upsert({
+      ...nextActionToUpdate,
+      ...newNextAction,
+    });
   }
 
   async findAllForUser(userId: number) {
     return await this.nextActionsRepository.find(
       { userId, done: false },
-      { orderBy: { deadline: QueryOrder.DESC } },
+      { populate: ['tags'], orderBy: { deadline: QueryOrder.DESC } },
     );
   }
 }
