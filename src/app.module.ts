@@ -7,6 +7,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { NextActionsModule } from './next-actions/next-actions.module';
 import { TopicsModule } from './topics/topics.module';
 import { TagsModule } from './tags/tags.module';
+import { MyDayModule } from './my-day/my-day.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TagsModule } from './tags/tags.module';
     TopicsModule,
     TagsModule,
     MikroOrmModule.forRoot(),
+    MyDayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
